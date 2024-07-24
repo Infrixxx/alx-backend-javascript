@@ -1,49 +1,29 @@
 import fs from 'fs';
 
-/**
- * Reads the data of students in a CSV data file.
- * @param {String} dataPath The path to the CSV data file.
- * @author Odinaka Nnamani
- * @returns {Promise<{
- *   String: {firstname: String, lastname: String, age: number}[]
- * }>}
- */
-const readDatabase = (dataPath) => new Promise((resolve, reject) => {
-  if (!dataPath) {
-    reject(new Error('Cannot load the database'));
-  }
-  if (dataPath) {
-    fs.readFile(dataPath, (err, data) => {
-      if (err) {
-        reject(new Error('Cannot load the database'));
-      }
-      if (data) {
-        const fileLines = data
-          .toString('utf-8')
-          .trim()
-          .split('\n');
-        const studentGroups = {};
-        const dbFieldNames = fileLines[0].split(',');
-        const studentPropNames = dbFieldNames
-          .slice(0, dbFieldNames.length - 1);
-
-        for (const line of fileLines.slice(1)) {
-          const studentRecord = line.split(',');
-          const studentPropValues = studentRecord
-            .slice(0, studentRecord.length - 1);
-          const field = studentRecord[studentRecord.length - 1];
-          if (!Object.keys(studentGroups).includes(field)) {
-            studentGroups[field] = [];
+const readDatabase = (path) => new Promise((resolve, reject) => {
+  fs.readFile(path, 'utf8', (err, data) => {
+    if (err) reject(Error('Cannot load the database'));
+    else {
+      const hashtable = {};
+      const lines = data.split('\n');
+      let students = -1;
+      for (const line of lines) {
+        if (line.trim() !== '') {
+          const columns = line.split(',');
+          const field = columns[3];
+          const firstname = columns[0];
+          if (students >= 0) {
+            if (!Object.hasOwnProperty.call(hashtable, field)) {
+              hashtable[field] = [];
+            }
+            hashtable[field] = [...hashtable[field], firstname];
           }
-          const studentEntries = studentPropNames
-            .map((propName, idx) => [propName, studentPropValues[idx]]);
-          studentGroups[field].push(Object.fromEntries(studentEntries));
+          students += 1;
         }
-        resolve(studentGroups);
       }
-    });
-  }
+      resolve(hashtable);
+    }
+  });
 });
 
 export default readDatabase;
-module.exports = readDatabase;

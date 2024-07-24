@@ -1,17 +1,12 @@
-#!/usr/bin/env node
-/**
- * Dsiplays and executes a program thorugh command line
- */
-process.stdout.write('Welcome to Holberton School, what is your name?\n');
+console.log('Welcome to Holberton School, what is your name?');
 
 process.stdin.on('readable', () => {
-  const chunk = process.stdin.read();
-
-  if (chunk) {
-    process.stdout.write(`Your name is: ${chunk}`);
+  const input = process.stdin.read();
+  if (input !== null) {
+    process.stdout.write(`Your name is: ${input}`);
   }
 });
 
 process.stdin.on('end', () => {
-  process.stdout.write('This important software is now closing\n');
+  console.log('This important software is now closing');
 });
